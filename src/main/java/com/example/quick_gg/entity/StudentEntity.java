@@ -1,0 +1,43 @@
+package com.example.quick_gg.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+// 복합 유니크 처리(summoner_name, tag)
+@Table(name = "student",
+uniqueConstraints = {
+        @UniqueConstraint(
+                columnNames = {
+                        "summoner_name", "tag"
+                }
+        )
+})
+public class StudentEntity {
+
+    @Id
+    // DB에 ID값 자동 처리 위임
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String studentID;
+
+    @Column(nullable = false, length = 20)
+    private String name;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(name = "summoner_name", nullable = false, length = 50)
+    private String summonerName;
+
+    @Column(nullable = false, length = 100)
+    private String puuid;
+
+    @Column(nullable = false, length = 10)
+    private String tag;
+
+    @Column(name = "create_at",nullable = false,updatable = false)
+    private LocalDateTime createAt;
+}
