@@ -24,7 +24,7 @@ public class SignupResponse {
     // 소환사 태그 (예: KR1)
     private String tag;
 
-    // 가입 완료 시작
+    // 가입 완료 시각
     private LocalDateTime createAt;
 
 }
