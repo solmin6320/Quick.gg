@@ -1,6 +1,6 @@
 package com.example.quick_gg.jwt;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +77,32 @@ public class JwtTokenProvider {
                 .id(UUID.randomUUID().toString())
                 .signWith(secretKey)
                 .compact();
+    }
+
+    // JWT를 파싱하여 Claims(Payload) 반환
+    public Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    // JWT의 서명과 만료 여부를 검증
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token);
+            return true; // 검증 성공
+
+        } catch (ExpiredJwtException | // 토큰 만료
+                 UnsupportedJwtException | // 지원하지 않는 JWT
+                 MalformedJwtException | // 잘못된 형식의 JWT
+                 SecurityException | // 서명 검증 실패
+                 IllegalArgumentException e) { // 토큰이 비어있거나 null
+            return false;  // 검증 실패
+        }
     }
 }
