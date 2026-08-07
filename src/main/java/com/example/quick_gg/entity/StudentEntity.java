@@ -18,7 +18,7 @@ uniqueConstraints = {
                 }
         )
 })
-// CustomUserDetails에 쓰기 위해 생성자, 게터 추가
+// 생성자, 게터 추가
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
