@@ -1,6 +1,11 @@
 package com.example.quick_gg.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,6 +18,10 @@ uniqueConstraints = {
                 }
         )
 })
+// 생성자, 게터 어노테이션 추가
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class StudentEntity {
 
     @Id
