@@ -30,11 +30,10 @@ public class CustomUserDetails implements UserDetails {
     }
 
     // 사용자의 권한을 반환
-    // 현재 프로젝트는 관리자, 매니저 같은 역할이 없으므로 유저 권한으로 통일
+    // 현재 프로젝트는 권한이 정해져 있지 않기 때문에 권한 설정을 하지 않음
+    // 추후 권한 확장시 수정할 수 있도록 작성
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(
-                new SimpleGrantedAuthority("ROLE_USER")
-        );
+        return List.of();
     }
 }
