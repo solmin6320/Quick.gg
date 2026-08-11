@@ -18,6 +18,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     // 인증 매니저가 추가될 자리
+
+    
     
     // 시큐리티 필터 체인이 추가될 자리
 }
