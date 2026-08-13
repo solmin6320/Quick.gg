@@ -20,6 +20,6 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
          boolean existsByStudentNumber(String studentNumber);
 
          // id가 이미 등록되어 있는지 확인
-         boolean existsById(Long id);
+         boolean existsById(Integer id);
 
 }

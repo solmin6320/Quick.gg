@@ -27,7 +27,7 @@ public class StudentEntity {
     @Id
     // DB에 ID값 자동 처리 위임
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false, unique = true, length = 10)
     private String studentID;

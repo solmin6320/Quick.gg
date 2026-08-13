@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class SignupResponse {
 
     // 가입된 학생의 PK
-    private Long id;
+    private Integer id;
 
     // 학번 (로그인 ID로 사용)
     private String studentID;

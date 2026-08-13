@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class LoginResponse {
 
     // 로그인한 학생의 PK
-    private Long id;
+    private Integer id;
 
     // API 요청 인증용 JWT
     private String accessToken;
