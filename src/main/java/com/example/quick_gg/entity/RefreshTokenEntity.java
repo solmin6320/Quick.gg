@@ -21,6 +21,7 @@ public class RefreshTokenEntity {
     private Integer id;
 
     // 여러 RefreshToken이 한 Student에 속하는 관계 (N:1)
+    // 로그인 시 기존 토큰을 삭제하므로 실제로는 학생당 1개만 유지 (다중 로그인 기능과 트레이드오프)
     @ManyToOne(fetch = FetchType.LAZY) // 필요 시점에만 조회 (지연 로딩 fetch 전략)
     @JoinColumn(name = "student_id", nullable = false) // 실제 fk 컬럼명
     private StudentEntity student;
