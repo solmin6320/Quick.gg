@@ -6,7 +6,7 @@ CREATE TABLE student (
                          summoner_name VARCHAR(50) NOT NULL,
                          puuid VARCHAR(100) NOT NULL UNIQUE,
                          tag VARCHAR(10) NOT NULL,
-                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
                          UNIQUE(summoner_name, tag)
 );
