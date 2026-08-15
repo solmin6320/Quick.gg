@@ -2,11 +2,13 @@ package com.example.quick_gg.dto.response;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
+@Builder
 public class LoginResponse {
 
     // 로그인한 학생의 PK
