@@ -7,6 +7,7 @@ import com.example.quick_gg.entity.RefreshTokenEntity;
 import com.example.quick_gg.entity.StudentEntity;
 import com.example.quick_gg.exception.CustomException;
 import com.example.quick_gg.exception.ErrorCode;
+import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.jwt.JwtTokenProvider;
 import com.example.quick_gg.repository.RefreshTokenRepository;
 import com.example.quick_gg.repository.StudentRepository;
@@ -25,6 +26,7 @@ public class LoginService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProperties jwtProperties; // 추가 주입
     private final RefreshTokenRepository refreshTokenRepository;
     private final StudentRepository studentRepository;
 
@@ -58,7 +60,9 @@ public class LoginService {
         RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
                 .student(student)
                 .token(refreshToken)
-                .expiresAt(LocalDateTime.now().plusDays(14)) // 만료 기간 조정
+                .expiresAt(LocalDateTime.now().plusNanos(
+                        jwtProperties.getRefreshTokenExpiration() * 1_000_000 // ms -> ns 변환
+                ))
                 .revoked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
