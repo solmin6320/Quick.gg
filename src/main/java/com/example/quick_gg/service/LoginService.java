@@ -2,6 +2,7 @@ package com.example.quick_gg.service;
 
 import com.example.quick_gg.dto.request.LoginRequest;
 import com.example.quick_gg.dto.response.LoginResponse;
+import com.example.quick_gg.dto.response.TokenPair;
 import com.example.quick_gg.entity.RefreshTokenEntity;
 import com.example.quick_gg.entity.StudentEntity;
 import com.example.quick_gg.exception.CustomException;
@@ -28,7 +29,7 @@ public class LoginService {
     private final StudentRepository studentRepository;
 
     // 학번 + 비밀번호로 인증 시도
-    public LoginResponse login(LoginRequest request) {
+    public TokenPair login(LoginRequest request) {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -65,8 +66,9 @@ public class LoginService {
         refreshTokenRepository.save(refreshTokenEntity);
 
         // accessToken만 응답으로 반환
-        return LoginResponse.builder()
+        return TokenPair.builder()
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }
