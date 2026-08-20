@@ -1,10 +1,7 @@
 package com.example.quick_gg.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -22,14 +19,15 @@ uniqueConstraints = {
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Builder
 public class StudentEntity {
 
     @Id
     // DB에 ID값 자동 처리 위임
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(name = "student_number",nullable = false, unique = true, length = 10)
     private String studentID;
 
     @Column(nullable = false, length = 20)
@@ -41,12 +39,12 @@ public class StudentEntity {
     @Column(name = "summoner_name", nullable = false, length = 50)
     private String summonerName;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 100, unique = true)
     private String puuid;
 
     @Column(nullable = false, length = 10)
     private String tag;
 
-    @Column(name = "create_at",nullable = false,updatable = false)
+    @Column(name = "created_at",nullable = false,updatable = false)
     private LocalDateTime createAt;
 }

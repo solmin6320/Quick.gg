@@ -1,15 +1,14 @@
 package com.example.quick_gg.dto.response;
 
-
 import lombok.*;
 
 @Getter
-@AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginResponse {
+@AllArgsConstructor
+// 서비스 -> 컨트롤러 사이에서만 쓰이는 내부 전달용 DTO
+public class TokenPair {
 
-    // API 요청 인증용 JWT
     private String accessToken;
-
+    private String refreshToken;
 }

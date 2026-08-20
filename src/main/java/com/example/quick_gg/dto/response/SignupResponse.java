@@ -1,19 +1,24 @@
 package com.example.quick_gg.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
+@Builder // 서비스 계층에서 Builder 생성을 위해 추가
 public class SignupResponse {
 
     // 가입된 학생의 PK
-    private Long id;
+    private Integer id;
 
     // 학번 (로그인 ID로 사용)
     private String studentID;
+
+    // 학생 비밀번호
+    private String password;
 
     // 학생 이름
     private String name;
