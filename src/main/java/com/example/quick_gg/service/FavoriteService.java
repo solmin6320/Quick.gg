@@ -39,9 +39,9 @@ public class FavoriteService {
         String summonerName = request.getSummonerName().trim();
         String tag = request.getTag().trim();
 
-        // 소환사 중복 등록 방지
+        // 소환사 중복 등록 방지 (대소문자 달라도 같은 소환사로 취급)
         if (favoriteSummonerRepository
-                .existsByStudentAndSummonerNameAndTag(student, summonerName, tag)) {
+                .existsByStudentAndSummonerNameIgnoreCaseAndTagIgnoreCase(student, summonerName, tag)) {
             throw new CustomException(ErrorCode.CONFLICT);
         }
 

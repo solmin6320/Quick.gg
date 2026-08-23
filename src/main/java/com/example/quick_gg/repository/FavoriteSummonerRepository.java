@@ -16,7 +16,8 @@ public interface FavoriteSummonerRepository extends JpaRepository<FavoriteSummon
     Optional<FavoriteSummonerEntity> findByIdAndStudent(Integer id, StudentEntity student);
 
     // 같은 소환사를 중복 등록하는 것을 방지
-    boolean existsByStudentAndSummonerNameAndTag(StudentEntity student,
-                                                 String summonerName,
-                                                 String tag);
+    // 라이엇 계정은 대소문자가 달라도 동일 계정이므로 대소문자 무시하고 비교
+    boolean existsByStudentAndSummonerNameIgnoreCaseAndTagIgnoreCase(StudentEntity student,
+                                                                     String summonerName,
+                                                                     String tag);
 }
