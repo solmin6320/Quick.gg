@@ -15,7 +15,7 @@ public class SignupResponse {
     private Integer id;
 
     // 학번 (로그인 ID로 사용)
-    private String studentID;
+    private String studentNumber;
 
     // 학생 비밀번호
     private String password;

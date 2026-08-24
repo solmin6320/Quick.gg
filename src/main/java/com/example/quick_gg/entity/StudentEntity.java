@@ -28,7 +28,7 @@ public class StudentEntity {
     private Integer id;
 
     @Column(name = "student_number",nullable = false, unique = true, length = 10)
-    private String studentID;
+    private String studentNumber;
 
     @Column(nullable = false, length = 20)
     private String name;

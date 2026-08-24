@@ -12,7 +12,7 @@ public class SignupRequest {
 
     // 학번 입력 검사
     @NotBlank(message = "학번을 입력해주세요")
-    private String studentID;
+    private String studentNumber;
 
     // 이름 입력 검사
     @NotBlank(message = "이름을 입력해주세요")

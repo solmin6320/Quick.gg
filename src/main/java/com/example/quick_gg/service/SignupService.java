@@ -46,7 +46,7 @@ public class SignupService {
 
         // DB 저장용
         StudentEntity student = StudentEntity.builder()
-                .studentID(request.getStudentID())
+                .studentNumber(request.getStudentID())
                 .name(request.getName())
                 .password(encodePassword)
                 .summonerName(request.getSummonerName())
@@ -61,7 +61,7 @@ public class SignupService {
 
         // 응답 반환용(비밀번호 제외)
         return SignupResponse.builder()
-                .studentID(student.getStudentID())
+                .studentID(student.getStudentNumber())
                 .name(student.getName())
                 .summonerName(student.getSummonerName())
                 .tag(student.getTag())

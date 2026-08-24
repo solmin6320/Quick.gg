@@ -9,6 +9,7 @@ import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.service.LoginService;
 import com.example.quick_gg.service.SignupService;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,7 @@ public class AuthController {
     // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<SignupResponse> signup(
+            @Valid
             @RequestBody SignupRequest request) {
 
         SignupResponse response = signupService.signup(request);
@@ -46,6 +48,7 @@ public class AuthController {
     // 로그인
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
+            @Valid
             @RequestBody LoginRequest request, HttpServletResponse response) {
 
         // access, refresh 토큰을 받음

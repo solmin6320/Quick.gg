@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
     // 사용자의 로그인 ID(학번)를 반환
     @Override
     public String getUsername() {
-        return studentEntity.getStudentID();
+        return studentEntity.getStudentNumber();
     }
 
     // 사용자의 비밀번호를 반환
