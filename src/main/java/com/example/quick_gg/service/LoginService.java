@@ -1,7 +1,6 @@
 package com.example.quick_gg.service;
 
 import com.example.quick_gg.dto.request.LoginRequest;
-import com.example.quick_gg.dto.response.LoginResponse;
 import com.example.quick_gg.dto.response.TokenPair;
 import com.example.quick_gg.entity.RefreshTokenEntity;
 import com.example.quick_gg.entity.StudentEntity;
@@ -11,6 +10,7 @@ import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.jwt.JwtTokenProvider;
 import com.example.quick_gg.repository.RefreshTokenRepository;
 import com.example.quick_gg.repository.StudentRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,6 +31,7 @@ public class LoginService {
     private final StudentRepository studentRepository;
 
     // 학번 + 비밀번호로 인증 시도
+    @Transactional
     public TokenPair login(LoginRequest request) {
         Authentication authentication;
         try {
