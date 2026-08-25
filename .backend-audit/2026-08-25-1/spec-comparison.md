@@ -120,8 +120,8 @@
 
 ### [DB] student 테이블
 - **코드 상태**: 완전 일치
-- **근거**: `src/main/resources/db/migration/ V1__create_student_table.sql` 및 `entity/StudentEntity.java:23-50` — 컬럼/제약(UNIQUE student_number, UNIQUE puuid, UNIQUE(summoner_name, tag)) 모두 명세와 동일.
-- **비고(확인 필요)**: 마이그레이션 파일명 `" V1__create_student_table.sql"` 앞에 **공백**이 들어가 있다. Flyway가 버전 파싱에 실패할 가능성이 높다 (V2~V4는 정상). 파일명 수정 필요.
+- **근거**: `src/main/resources/db/migration/V1__create_student_table.sql` 및 `entity/StudentEntity.java:23-50` — 컬럼/제약(UNIQUE student_number, UNIQUE puuid, UNIQUE(summoner_name, tag)) 모두 명세와 동일.
+- **비고(확인 필요)**: 마이그레이션 파일명 `"V1__create_student_table.sql"` 앞에 **공백**이 들어가 있다. Flyway가 버전 파싱에 실패할 가능성이 높다 (V2~V4는 정상). 파일명 수정 필요.
 
 ### [DB] refresh_token 테이블
 - **코드 상태**: 완전 일치
