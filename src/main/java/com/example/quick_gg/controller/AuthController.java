@@ -7,6 +7,7 @@ import com.example.quick_gg.dto.response.SignupResponse;
 import com.example.quick_gg.dto.response.TokenPair;
 import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.service.LoginService;
+import com.example.quick_gg.service.RefreshService;
 import com.example.quick_gg.service.SignupService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -15,10 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 
@@ -30,6 +28,7 @@ public class AuthController {
     // 이름 임의 지정
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 
+    private final RefreshService refreshService;
     private final SignupService signupService;
     private final LoginService loginService;
     private final JwtProperties jwtProperties; // 쿠키 만료시간을 원본값에서 가져옴
@@ -78,5 +77,26 @@ public class AuthController {
                 .maxAge(Duration.ofMillis(jwtProperties.getRefreshTokenExpiration()))
                 .build();
     }
+
+    // 액세스 토큰 재발급
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@CookieValue(value = REFRESH_TOKEN_COOKIE_NAME,
+            required = false) String refreshToken, HttpServletResponse response) {
+
+            // 쿠키의 refreshToken으로 새 토큰 쌍을 발급받음
+        TokenPair tokenPair =
+                refreshService.reissue(refreshToken);
+
+        // 회전된 refreshToken을 다시 쿠키로 내려줌
+        ResponseCookie cookie = buildRefreshTokenCookie(tokenPair.getRefreshToken());
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        // 응답 바디에는 액세스 토큰만 포함
+        return ResponseEntity.ok(LoginResponse.builder()
+                        .accessToken(tokenPair.getAccessToken())
+                        .build());
+    }
+
+
 
 }
