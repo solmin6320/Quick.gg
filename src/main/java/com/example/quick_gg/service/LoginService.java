@@ -36,7 +36,7 @@ public class LoginService {
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getStudentID(),
+                            request.getStudentNumber(),
                             request.getPassword()
                     )
             );
@@ -46,7 +46,7 @@ public class LoginService {
         }
 
         // 인증된 학생 엔티티 조회
-        StudentEntity student = studentRepository.findByStudentNumber(request.getStudentID())
+        StudentEntity student = studentRepository.findByStudentNumber(request.getStudentNumber())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         // 기존 refreshToken 삭제 (다중 기기 포기, 항상 최신 로그인만 유효)

@@ -13,11 +13,19 @@
 | 완전 일치 | 10 |
 | 부분 구현 | 5 |
 | 불일치 | 4 |
-| 미구현 | 3 |
+| 미구현 | 2 |
+| 범위 제외 (개발자 결정) | 1 |
 | 문서에 없음(확인 필요) | 3 |
 
 > **선행 차단 이슈**: 현재 `./gradlew compileJava` 가 실패한다 (`SignupService.java:53` 심볼 `puuid` 없음).
-> 즉 회원가입 경로는 아직 실행 자체가 불가능하며, 아래 "완전 일치" 항목들도 런타임 검증은 되지 않은 상태다.
+> 단, 이는 Riot API 파싱 로직 미작성에 따른 **의도된 진행 중 상태**로 개발자가 확인함.
+> 회원가입 경로는 아직 실행 불가이며, 아래 "완전 일치" 항목들도 런타임 검증은 되지 않은 상태다.
+
+## 개발자 결정 사항 (2026-08-25 확인)
+
+1. **학교 인증코드 기능 제외** — 트레이드오프로 의도적 제외. 개발 시간 단축 + 교외 사용자에게도 개방.
+2. **Refresh Token — 재발급만 남음** — 로그아웃 엔드포인트는 범위 밖. `/auth/refresh` 만 구현 예정.
+3. **Riot API 파싱 로직 미작성** — 컴파일 에러는 예상된 상태. 이후 작업.
 
 ---
 
@@ -35,15 +43,20 @@
 
 ### [명세 #6] 학교 인증 코드 검증
 - **기획서 내용**: "학교 인증 코드" 입력, 예외 처리 항목에 "인증코드 검증" 명시, API 명세 예외에 "인증코드 오류" 명시.
-- **코드 상태**: **미구현**
-- **근거**: `SignupRequest.java:40` 에 `verificationCode` 필드는 있으나, `SignupService.signup()` (`service/SignupService.java:23-71`) 전체에서 `getVerificationCode()` 호출이 전혀 없다. 코드 정답값을 담은 설정/상수/테이블도 존재하지 않음.
-- **차이 설명**: 인증코드를 아무 값이나 넣어도 가입이 통과한다. "성일정보고 학생만 가입 가능"이라는 #6의 핵심 제약이 현재 전혀 걸려 있지 않다.
+- **코드 상태**: **범위 제외 (개발자 결정, 2026-08-25)**
+- **결정 내용**: 트레이드오프로 의도적 제외. 개발 시간 단축 + 성일정보고 외부 사용자에게도 가입 개방.
+- **근거**: `service/SignupService.java:23-71` 에 `getVerificationCode()` 호출 없음 — 결정과 코드가 일치한다.
+- **남은 후속 작업**:
+  1. `dto/request/SignupRequest.java:39-40` 의 `@NotBlank private String verificationCode;` **필드 제거 필요**. 지금은 `@Valid` 가 없어 무해하지만, `@Valid` 를 붙이는 순간 프론트가 인증코드를 보내지 않으면 회원가입이 전부 400 으로 막힌다.
+  2. 기획서 #6 제목 "회원가입 (성일정보고 학생만 가입 가능)", 입력 항목의 "학교 인증 코드", 예외 처리의 "인증코드 검증" 줄 갱신 필요.
+- **팀 차원 영향 (본인 범위 밖, 공유용)**: 기획서 #5 학교 랭킹이 "성일정보고 학생만 등록"을 전제로 한다. 교외 사용자가 가입 가능해지면 랭킹 대상을 가려낼 기준이 사라지므로 랭킹 담당자와 협의 필요.
 
 ### [명세 #6 / DB] puuid 저장 (Riot API 연동)
 - **기획서 내용**: `student.puuid VARCHAR(100) NOT NULL UNIQUE` — 소환사명+태그로 Riot API 조회하여 puuid를 확보해야 한다.
-- **코드 상태**: **미구현 (컴파일 차단)**
-- **근거**: `service/SignupService.java:53` `.puuid(puuid)` — 선언되지 않은 변수. 본인이 남긴 주석 "라이엇 API 연동 로직이 아직 완성되지 않아 컴파일 에러(고칠 예정)". Riot API 클라이언트 클래스 자체가 프로젝트에 없음 (`build.gradle:26` 에 webflux만 추가된 상태).
-- **차이 설명**: 소환사 실존 검증 + puuid 확보 로직이 통째로 비어 있다. 이것이 현재 빌드를 깨뜨리는 유일한 컴파일 에러다.
+- **코드 상태**: **미구현 (진행 예정 — 개발자 확인됨)**
+- **근거**: `service/SignupService.java:53` `.puuid(puuid)` — 선언되지 않은 변수. Riot API 클라이언트 클래스 자체가 프로젝트에 없음 (`build.gradle:26` 에 webflux만 추가된 상태).
+- **차이 설명**: 소환사 실존 검증 + puuid 확보 로직이 비어 있다. 이것이 현재 빌드를 깨뜨리는 유일한 컴파일 에러이며, Riot API 파싱 로직 미작성에 따른 예상된 상태로 개발자가 확인함.
+- **주의**: 이 에러가 남아 있는 동안은 애플리케이션을 띄울 수 없어 로그인 흐름의 런타임 검증도 불가능하다. 로그인 쪽을 먼저 테스트하려면 이 줄만 임시 상수로 막아두는 방법이 있다.
 
 ### [명세 예외] 학번 중복 검사
 - **코드 상태**: 완전 일치
@@ -115,10 +128,11 @@
 - **근거**: `db/migration/V4__create_refresh_token_table.sql`, `entity/RefreshTokenEntity.java:14-42`.
 - **비고**: `RefreshTokenEntity.java:37` `private Boolean revoked = false;` 는 `@Builder.Default` 가 없어 초기값이 무시된다는 컴파일 경고가 뜬다. 현재 `LoginService.java:66` 에서 명시적으로 `.revoked(false)` 를 넣어 주고 있어 실질 영향은 없다.
 
-### [DB/기능] Refresh Token 활용 (재발급 / 로그아웃)
-- **코드 상태**: 부분 구현
-- **근거**: 발급·저장·기존 토큰 삭제는 구현됨 (`service/LoginService.java:53,57,60-70`), httpOnly 쿠키 전달도 구현됨 (`controller/AuthController.java:68-77`). `RefreshTokenRepository.java:12,15` 에 `findByToken()`, `deleteByToken()` 이 선언되어 있으나 **어디서도 호출되지 않는다**.
-- **차이 설명**: `POST /auth/refresh` (토큰 재발급), `POST /auth/logout` 엔드포인트가 없다. 기획서 API 명세에도 이 두 엔드포인트는 없지만, DB 명세에 `refresh_token` 테이블(`revoked` 컬럼 포함)이 있는 이상 재발급/로그아웃 흐름은 완결되어야 한다. **기획서와 코드 중 어느 쪽을 기준으로 맞출지 확인 필요.**
+### [DB/기능] Refresh Token 활용 (재발급)
+- **코드 상태**: 부분 구현 — **재발급 엔드포인트만 남음 (개발자 확인, 2026-08-25)**
+- **근거**: 발급·저장·기존 토큰 삭제는 구현됨 (`service/LoginService.java:53,57,60-70`), httpOnly 쿠키 전달도 구현됨 (`controller/AuthController.java:68-77`). `RefreshTokenRepository.java:12` 의 `findByToken()` 은 아직 호출되지 않는다 — 재발급 로직에서 쓰일 자리.
+- **남은 작업**: `POST /auth/refresh` — 쿠키에서 `refreshToken` 추출 → `findByToken()` 조회 → `expiresAt` / `revoked` 검증 → 새 accessToken 발급.
+- **범위 밖 (개발자 결정)**: 로그아웃 엔드포인트는 구현하지 않음. 따라서 `RefreshTokenRepository.java:15` 의 `deleteByToken()` 과 `RefreshTokenEntity` 의 `revoked` 컬럼은 재발급 검증 용도 외에는 쓰이지 않는다 — `deleteByToken()` 은 삭제 검토 대상.
 
 ### [API] 공통 응답 형식 `{ "success": true, "data": {} }` / `{ "success": false, "message": "..." }`
 - **코드 상태**: **불일치**
@@ -149,18 +163,37 @@
 
 ---
 
-## 남은 작업 정리 (우선순위)
+## 남은 작업 정리 (2026-08-25 결정 반영, 우선순위)
+
+### A. 지금 바로 할 수 있는 것 (Riot API와 무관)
 
 | 순위 | 항목 | 위치 | 성격 |
 |---|---|---|---|
-| 1 | Riot API 연동으로 `puuid` 확보 | `service/SignupService.java:53` | 컴파일 차단 |
-| 2 | `application.yml` 작성 (jwt.*, datasource) | `src/main/resources/` | 실행 차단 |
-| 3 | Repository 메서드명 ↔ 엔티티 필드명 정렬 | `repository/StudentRepository.java:11,20` | 기동 실패 가능 |
-| 4 | 학교 인증코드 검증 로직 | `service/SignupService.java` | 명세 미구현 |
-| 5 | 마이그레이션 파일명 앞 공백 제거 | `db/migration/ V1__...sql` | 기동 실패 가능 |
-| 6 | 컨트롤러 `@Valid` 추가 + 비밀번호 최소길이 6으로 통일 | `controller/AuthController.java:39,49`, `dto/request/*` | 명세 불일치 |
-| 7 | 공통 응답 래퍼(`success`/`data`) 적용 여부 결정 | 전 응답 DTO | 명세 불일치 |
-| 8 | puuid 기준 소환사 중복 검사 추가 | `service/SignupService.java` | 부분 구현 |
-| 9 | `/auth/refresh`, `/auth/logout` 엔드포인트 | `controller/AuthController.java` | 부분 구현 (기획서 확인 필요) |
-| 10 | `JwtAuthenticationFilter` null 체크 대상 수정 | `security/JwtAuthenticationFilter.java:38` | 로직 오류 |
-| 11 | `SignupResponse` 의 `password` 필드 제거 / `id` 설정 | `dto/response/SignupResponse.java` | 확인 필요 |
+| 1 | `application.yml` 작성 (jwt.issuer/secret/만료, MariaDB datasource) | `src/main/resources/` | 실행 차단 |
+| 2 | Repository 메서드명 ↔ 엔티티 필드명 정렬 (`findByStudentNumber` vs 필드 `studentID`) | `repository/StudentRepository.java:11,20` | 기동 실패 가능 |
+| 3 | 마이그레이션 파일명 앞 공백 제거 | `db/migration/ V1__...sql` | 기동 실패 가능 |
+| 4 | `verificationCode` 필드 제거 (인증코드 기능 제외 결정에 따른 정리) | `dto/request/SignupRequest.java:39-40` | 결정 후속 |
+| 5 | 컨트롤러 `@Valid` 추가 + 비밀번호 최소길이 2 → 6 으로 통일 | `controller/AuthController.java:39,49`, `dto/request/*:18,23` | 명세 불일치 |
+| 6 | `POST /auth/refresh` 재발급 엔드포인트 | `controller/AuthController.java`, `service/LoginService.java` | 부분 구현 |
+| 7 | 공통 응답 래퍼(`success`/`data`) 적용 여부 결정 | 전 응답 DTO, `dto/response/ErrorResponse.java` | 명세 불일치 |
+| 8 | `JwtAuthenticationFilter` null 체크 대상 수정 (`jwtTokenProvider` → `token`) | `security/JwtAuthenticationFilter.java:38` | 로직 오류 |
+| 9 | `SignupResponse` 의 `password` 필드 제거 / `id` 설정 | `dto/response/SignupResponse.java:15,21` | 확인 필요 |
+
+> 1~3번을 처리하면 (`SignupService.java:53` 을 임시로 막아둔다는 전제 하에) 서버가 기동되어
+> 로그인 흐름 전체를 실제로 테스트할 수 있게 된다.
+
+### B. Riot API 파싱 로직 완성 이후
+
+| 항목 | 위치 | 성격 |
+|---|---|---|
+| `puuid` 확보 및 소환사 실존 검증 | `service/SignupService.java:53` | 컴파일 차단 |
+| puuid 기준 소환사 중복 검사 (`existsByPuuid()` 호출 연결) | `service/SignupService.java`, `repository/StudentRepository.java:17` | 부분 구현 |
+
+### C. 기획서 문서 갱신 필요
+
+- #6 제목 "회원가입 (성일정보고 학생만 가입 가능)" → 인증코드 제외 결정 반영
+- #6 입력 항목에서 "학교 인증 코드" 제거
+- "그 밖의 예외 처리" 에서 "인증코드 검증" 제거
+- API 명세 `POST /auth/signup` 예외 목록에서 "인증코드 오류" 제거
+- API 명세에 `POST /auth/refresh` 추가
+- #5 학교 랭킹의 "성일정보고 학생만 등록" 전제 재검토 (랭킹 담당자 협의)
