@@ -7,6 +7,7 @@ import com.example.quick_gg.dto.response.SignupResponse;
 import com.example.quick_gg.dto.response.TokenPair;
 import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.service.LoginService;
+import com.example.quick_gg.service.LogoutService;
 import com.example.quick_gg.service.RefreshService;
 import com.example.quick_gg.service.SignupService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,6 +33,7 @@ public class AuthController {
     private final SignupService signupService;
     private final LoginService loginService;
     private final JwtProperties jwtProperties; // 쿠키 만료시간을 원본값에서 가져옴
+    private final LogoutService logoutService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -66,17 +68,6 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
-    // refreshToken 쿠키 생성
-    private ResponseCookie buildRefreshTokenCookie(String token) {
-        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, token)
-                .httpOnly(true) // js가 직접 못 건들게 만듬(XSS 공격 방어)
-                .secure(true) // secure 에서만 주고 받음
-                // 다른 도메인에서 요헝해도 쿠키를 실어보냄(CSRF 공격 취약 <-> 백엔드, 프론트 별도 배포)
-                .sameSite("None") // 트레이드오프
-                .path("/")
-                .maxAge(Duration.ofMillis(jwtProperties.getRefreshTokenExpiration()))
-                .build();
-    }
 
     // 액세스 토큰 재발급
     @PostMapping("/refresh")
@@ -97,6 +88,48 @@ public class AuthController {
                         .build());
     }
 
+    // 로그아웃
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(value = REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken, HttpServletResponse response) {
+
+        // DB에 저장된 refreshToken 제거
+        logoutService.logout(refreshToken);
+
+        // 브라우저에 남아있는 쿠키도 즉시 만료
+        ResponseCookie cookie = buildExpiredRefreshTokenCookie();
+
+        // 쿠키를 문자열 형태로 변환해 헤더로 반환
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
+    // refreshToken 쿠키 생성
+    private ResponseCookie buildRefreshTokenCookie(String token) {
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, token)
+                .httpOnly(true) // js가 직접 못 건들게 만듬(XSS 공격 방어)
+                .secure(true) // secure 에서만 주고 받음
+                // 다른 도메인에서 요헝해도 쿠키를 실어보냄(CSRF 공격 취약 <-> 백엔드, 프론트 별도 배포)
+                .sameSite("None") // 트레이드오프
+                .path("/")
+                .maxAge(Duration.ofMillis(jwtProperties.getRefreshTokenExpiration()))
+                .build();
+    }
+
+    // 로그아웃 시 브라우저의 리프레시 토큰을 즉시 만료
+    private ResponseCookie buildExpiredRefreshTokenCookie() {
+
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
+                .httpOnly(true) // js가 직접 못 건들게 만듬(XSS 방어)
+                .secure(true) // secure 에서만 주고 받음
+                .sameSite("None")
+                .path("/")
+                .maxAge(0) // 0초 -> 브라우저가 쿠키를 즉시 삭제
+                .build();
+    }
 
 
 }

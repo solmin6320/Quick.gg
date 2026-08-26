@@ -57,7 +57,7 @@ public class SecurityConfig {
                 )
                 // 경로별 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/refresh")
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/refresh", "/auth/logout")
                         .permitAll()
                         .anyRequest().authenticated() // 회원가입, 로그인 제외 모든 경로는 인증된 사용자만 접근 가능
                 )
