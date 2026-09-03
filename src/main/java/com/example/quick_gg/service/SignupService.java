@@ -6,6 +6,7 @@ import com.example.quick_gg.entity.StudentEntity;
 import com.example.quick_gg.exception.CustomException;
 import com.example.quick_gg.exception.ErrorCode;
 import com.example.quick_gg.repository.StudentRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,10 @@ public class SignupService {
     private final PasswordEncoder passwordEncoder;
 
     //  회원 생성
+    @Transactional
     public SignupResponse signup(SignupRequest request) {
         // 학번 중복 검사
-        if (repository.existsByStudentNumber(request.getStudentID())) {
+        if (repository.existsByStudentNumber(request.getStudentNumber())) {
             throw new CustomException(ErrorCode.CONFLICT);
         }
 
@@ -46,7 +48,7 @@ public class SignupService {
 
         // DB 저장용
         StudentEntity student = StudentEntity.builder()
-                .studentID(request.getStudentID())
+                .studentNumber(request.getStudentNumber())
                 .name(request.getName())
                 .password(encodePassword)
                 .summonerName(request.getSummonerName())
@@ -61,7 +63,7 @@ public class SignupService {
 
         // 응답 반환용(비밀번호 제외)
         return SignupResponse.builder()
-                .studentID(student.getStudentID())
+                .studentNumber(student.getStudentNumber())
                 .name(student.getName())
                 .summonerName(student.getSummonerName())
                 .tag(student.getTag())

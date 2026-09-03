@@ -1,7 +1,6 @@
 package com.example.quick_gg.service;
 
 import com.example.quick_gg.dto.request.LoginRequest;
-import com.example.quick_gg.dto.response.LoginResponse;
 import com.example.quick_gg.dto.response.TokenPair;
 import com.example.quick_gg.entity.RefreshTokenEntity;
 import com.example.quick_gg.entity.StudentEntity;
@@ -11,6 +10,7 @@ import com.example.quick_gg.jwt.JwtProperties;
 import com.example.quick_gg.jwt.JwtTokenProvider;
 import com.example.quick_gg.repository.RefreshTokenRepository;
 import com.example.quick_gg.repository.StudentRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -31,12 +31,13 @@ public class LoginService {
     private final StudentRepository studentRepository;
 
     // 학번 + 비밀번호로 인증 시도
+    @Transactional
     public TokenPair login(LoginRequest request) {
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getStudentID(),
+                            request.getStudentNumber(),
                             request.getPassword()
                     )
             );
@@ -46,7 +47,7 @@ public class LoginService {
         }
 
         // 인증된 학생 엔티티 조회
-        StudentEntity student = studentRepository.findByStudentNumber(request.getStudentID())
+        StudentEntity student = studentRepository.findByStudentNumber(request.getStudentNumber())
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 
         // 기존 refreshToken 삭제 (다중 기기 포기, 항상 최신 로그인만 유효)
