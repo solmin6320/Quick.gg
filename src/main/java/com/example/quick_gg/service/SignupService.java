@@ -52,7 +52,7 @@ public class SignupService {
                 .name(request.getName())
                 .password(encodePassword)
                 .summonerName(request.getSummonerName())
-                .puuid(puuid) // 라이엇 API 연동 로직이 아직 완성되지 않아 컴파일 에러(고칠 예정)
+                .puuid(null) // 라이엇 APi 연동이 아직 없으므로 null 값 처리
                 .tag(request.getTag())
                 .createAt(LocalDateTime.now())
                 .build();
